@@ -6,7 +6,6 @@ void insertionSort(int arr[], int n) {
         int key = arr[i];
         int j = i - 1;
 
-        // Shift elements that are greater than key to one position ahead
         while (j >= 0 && arr[j] > key) {
             arr[j + 1] = arr[j];
             j--;
