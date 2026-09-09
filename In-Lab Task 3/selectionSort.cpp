@@ -5,7 +5,6 @@ void selectionSort(int arr[], int n) {
 
     int count = 0;
     for (int i = 0; i < n - 1; i++) {
-        // Finding the index of the minimum element in the remaining unsorted part
         int min = i;
         for (int j = i + 1; j < n; j++) {
             if (arr[j] < arr[min]) {
