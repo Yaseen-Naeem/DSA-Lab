@@ -8,7 +8,6 @@ void combSort(int arr[], int n) {
     bool swapped = true;
 
     while (gap > 1 || swapped) {
-        // Shrink gap by factor of 1.3
         gap = (gap * 10) / 13;
         if (gap < 1) gap = 1;
 
