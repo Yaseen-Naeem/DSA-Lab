@@ -1,217 +1,254 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
 class Node
 {
 public:
     int data;
+    Node* prev;
     Node* next;
 
     Node(int val)
     {
         data = val;
+        prev = NULL;
         next = NULL;
     }
 };
 
-class CircularLinkedList
+class DoublyLinkedList
 {
-public:
+private:
     Node* head;
     Node* tail;
 
-    CircularLinkedList()
+public:
+    DoublyLinkedList()
     {
         head = NULL;
         tail = NULL;
     }
 
-    // Task 5: Display each node exactly once
-    void display()
+    void displayForward()
     {
-        if(head == NULL)
-        {
-            cout << "List is empty" << endl;
-            return;
-        }
-
         Node* temp = head;
 
-        do
+        while (temp != NULL)
         {
-            cout << temp->data << " ";
+            cout << temp->data;
+
+            if (temp->next != NULL)
+                cout << " <-> ";
+
             temp = temp->next;
         }
-        while(temp != head);
 
         cout << endl;
     }
 
-    // Task 6: Add node at end
-    void append(int val)
+    void displayBackward()
+    {
+        Node* temp = tail;
+
+        while (temp != NULL)
+        {
+            cout << temp->data;
+
+            if (temp->prev != NULL)
+                cout << " <-> ";
+
+            temp = temp->prev;
+        }
+
+        cout << endl;
+    }
+
+    void insertAtStart(int val)
     {
         Node* newNode = new Node(val);
 
-        if(head == NULL)
+        if (head == NULL)
         {
             head = newNode;
             tail = newNode;
-            tail->next = head;
-        }
-        else
-        {
-            tail->next = newNode;
-            tail = newNode;
-            tail->next = head;
-        }
-    }
-
-    // Task 6: Insert at a 0-indexed position
-    void insert(int pos, int val)
-    {
-        if(pos < 0)
-        {
-            cout << "Invalid position" << endl;
             return;
         }
 
-        if(pos == 0)
+        newNode->next = head;
+        head->prev = newNode;
+        head = newNode;
+    }
+
+    void insertAtEnd(int val)
+    {
+        Node* newNode = new Node(val);
+
+        if (tail == NULL)
         {
-            Node* newNode = new Node(val);
+            head = newNode;
+            tail = newNode;
+            return;
+        }
 
-            if(head == NULL)
-            {
-                head = newNode;
-                tail = newNode;
-                tail->next = head;
-            }
-            else
-            {
-                newNode->next = head;
-                head = newNode;
-                tail->next = head;
-            }
+        newNode->prev = tail;
+        tail->next = newNode;
+        tail = newNode;
+    }
 
+    void insertAtPosition(int pos, int val)
+    {
+        if (pos == 0)
+        {
+            insertAtStart(val);
             return;
         }
 
         Node* temp = head;
 
-        for(int i = 0; i < pos - 1 && temp != tail; i++)
-        {
+        for (int i = 0; i < pos - 1; i++)
             temp = temp->next;
-        }
 
-        if(temp == tail && pos > 1)
+        if (temp == tail)
         {
-            cout << "Invalid position" << endl;
+            insertAtEnd(val);
             return;
         }
 
         Node* newNode = new Node(val);
 
         newNode->next = temp->next;
-        temp->next = newNode;
+        newNode->prev = temp;
 
-        if(temp == tail)
-        {
-            tail = newNode;
-            tail->next = head;
-        }
+        temp->next->prev = newNode;
+        temp->next = newNode;
     }
 
-    // Task 6: Delete first node containing val
-    void deleteValue(int val)
+    void deleteFromStart()
     {
-        if(head == NULL)
-        {
-            cout << "List is empty" << endl;
+        if (head == NULL)
             return;
-        }
 
         Node* temp = head;
-        Node* prev = tail;
 
-        do
+        if (head == tail)
         {
-            if(temp->data == val)
+            head = NULL;
+            tail = NULL;
+        }
+        else
+        {
+            head = head->next;
+            head->prev = NULL;
+        }
+
+        delete temp;
+    }
+
+    void deleteFromEnd()
+    {
+        if (tail == NULL)
+            return;
+
+        Node* temp = tail;
+
+        if (head == tail)
+        {
+            head = NULL;
+            tail = NULL;
+        }
+        else
+        {
+            tail = tail->prev;
+            tail->next = NULL;
+        }
+
+        delete temp;
+    }
+
+    void deleteValue(int val)
+    {
+        Node* temp = head;
+
+        while (temp != NULL)
+        {
+            if (temp->data == val)
             {
-                if(head == tail)
+                if (temp == head)
                 {
-                    head = NULL;
-                    tail = NULL;
+                    deleteFromStart();
+                    return;
                 }
-                else
+
+                if (temp == tail)
                 {
-                    prev->next = temp->next;
-
-                    if(temp == head)
-                    {
-                        head = temp->next;
-                        tail->next = head;
-                    }
-
-                    if(temp == tail)
-                    {
-                        tail = prev;
-                        tail->next = head;
-                    }
+                    deleteFromEnd();
+                    return;
                 }
+
+                temp->prev->next = temp->next;
+                temp->next->prev = temp->prev;
 
                 delete temp;
                 return;
             }
 
-            prev = temp;
             temp = temp->next;
         }
-        while(temp != head);
 
         cout << "Value not found" << endl;
     }
 
-    // Task 6: Search for a value
-    bool search(int key)
+    void reverse()
     {
-        if(head == NULL)
-            return false;
-
         Node* temp = head;
 
-        do
+        while (temp != NULL)
         {
-            if(temp->data == key)
-                return true;
+            Node* nextNode = temp->next;
 
-            temp = temp->next;
+            temp->next = temp->prev;
+            temp->prev = nextNode;
+
+            temp = nextNode;
         }
-        while(temp != head);
 
-        return false;
+        Node* tempHead = head;
+        head = tail;
+        tail = tempHead;
     }
 };
 
 int main()
 {
-    CircularLinkedList list;
+    DoublyLinkedList list;
 
-    list.append(10);
-    list.append(30);
-    list.insert(1, 20);
+    list.insertAtEnd(10);
+    list.insertAtEnd(30);
+    list.insertAtPosition(1, 20);
 
-    cout << "List: ";
-    list.display();
+    cout << "Forward: ";
+    list.displayForward();
 
+    cout << "Backward: ";
+    list.displayBackward();
+
+    list.insertAtStart(5);
+    list.insertAtEnd(40);
+
+    cout << "After insertion: ";
+    list.displayForward();
+
+    list.deleteFromStart();
+    list.deleteFromEnd();
     list.deleteValue(20);
 
-    cout << "After deleting 20: ";
-    list.display();
+    cout << "After deletion: ";
+    list.displayForward();
 
-    if(list.search(30))
-        cout << "30 found" << endl;
-    else
-        cout << "30 not found" << endl;
+    list.reverse();
+
+    cout << "After reverse: ";
+    list.displayForward();
 
     return 0;
 }
